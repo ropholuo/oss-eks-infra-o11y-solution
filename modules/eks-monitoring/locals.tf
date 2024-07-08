@@ -13,6 +13,7 @@ locals {
   managed_prometheus_workspace_id       = var.enable_managed_prometheus ? aws_prometheus_workspace.this[0].id : var.managed_prometheus_workspace_id
   managed_prometheus_workspace_region   = coalesce(var.managed_prometheus_workspace_region, data.aws_region.current.name)
   managed_prometheus_workspace_endpoint = "https://aps-workspaces.${local.managed_prometheus_workspace_region}.amazonaws.com/workspaces/${local.managed_prometheus_workspace_id}/"
+  managed_prometheus_workspace_arn      = "arn:${data.aws_partition.current.partition}:aps:${local.managed_prometheus_workspace_region}:${data.aws_caller_identity.current.account_id}:workspace/${local.managed_prometheus_workspace_id}"
 
   name                      = "adot-collector-kubeprometheus"
   kube_service_account_name = try(var.helm_config.service_account, local.name)
@@ -21,6 +22,8 @@ locals {
   eks_oidc_issuer_url  = replace(data.aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer, "https://", "")
   eks_cluster_endpoint = data.aws_eks_cluster.eks_cluster.endpoint
   eks_cluster_version  = data.aws_eks_cluster.eks_cluster.version
+  eks_cluster_arn      = data.aws_eks_cluster.eks_cluster.arn
+  eks_cluster_subnet_ids = data.aws_eks_cluster.eks_cluster.vpc_config[0].subnet_ids
 
   context = {
     aws_caller_identity_account_id = data.aws_caller_identity.current.account_id
@@ -118,9 +121,9 @@ locals {
     flux_kustomization_path   = try(var.apiserver_monitoring_config.flux_kustomization_path, "./artifacts/grafana-operator-manifests/eks/apiserver")
 
     dashboards = {
-      basic           = try(var.apiserver_monitoring_config.dashboards.basic, "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/apiserver/apiserver-basic.json")
-      advanced        = try(var.apiserver_monitoring_config.dashboards.advanced, "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/apiserver/apiserver-advanced.json")
-      troubleshooting = try(var.apiserver_monitoring_config.dashboards.troubleshooting, "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/apiserver/apiserver-troubleshooting.json")
+      basic           = try(var.apiserver_monitoring_config.dashboards.basic, "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/apiserver/apiserver-basic.json")
+      advanced        = try(var.apiserver_monitoring_config.dashboards.advanced, "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/apiserver/apiserver-advanced.json")
+      troubleshooting = try(var.apiserver_monitoring_config.dashboards.troubleshooting, "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/apiserver/apiserver-troubleshooting.json")
     }
   }
 

@@ -453,15 +453,16 @@ variable "grafana_url" {
 variable "grafana_cluster_dashboard_url" {
   description = "Dashboard URL for Cluster Grafana Dashboard JSON"
   type        = string
-  default     = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/infrastructure/cluster.json"
+  default     = "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/infrastructure/cluster.json"
 }
 
 variable "grafana_kubelet_dashboard_url" {
   description = "Dashboard URL for Kubelet Grafana Dashboard JSON"
   type        = string
-  default     = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/infrastructure/kubelet.json"
+  default     = "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/infrastructure/kubelet.json"
 }
 
+# Excluded from the solution
 variable "grafana_kubeproxy_dashboard_url" {
   description = "Dashboard URL for kube-proxy Grafana Dashboard JSON"
   type        = string
@@ -471,25 +472,25 @@ variable "grafana_kubeproxy_dashboard_url" {
 variable "grafana_namespace_workloads_dashboard_url" {
   description = "Dashboard URL for Namespace Workloads Grafana Dashboard JSON"
   type        = string
-  default     = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/infrastructure/namespace-workloads.json"
+  default     = "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/infrastructure/namespace-workloads.json"
 }
 
 variable "grafana_node_exporter_dashboard_url" {
   description = "Dashboard URL for Node Exporter Grafana Dashboard JSON"
   type        = string
-  default     = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/infrastructure/nodeexporter-nodes.json"
+  default     = "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/infrastructure/nodeexporter-nodes.json"
 }
 
 variable "grafana_nodes_dashboard_url" {
   description = "Dashboard URL for Nodes Grafana Dashboard JSON"
   type        = string
-  default     = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/infrastructure/nodes.json"
+  default     = "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/infrastructure/nodes.json"
 }
 
 variable "grafana_workloads_dashboard_url" {
   description = "Dashboard URL for Workloads Grafana Dashboard JSON"
   type        = string
-  default     = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/infrastructure/workloads.json"
+  default     = "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/infrastructure/workloads.json"
 }
 
 variable "target_secret_name" {
