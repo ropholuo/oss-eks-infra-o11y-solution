@@ -5,15 +5,6 @@ resource "aws_prometheus_workspace" "this" {
   tags  = var.tags
 }
 
-module "operator" {
-  source = "./add-ons/adot-operator"
-  count  = var.enable_amazon_eks_adot ? 1 : 0
-
-  enable_cert_manager = var.enable_cert_manager
-  kubernetes_version  = local.eks_cluster_version
-  addon_context       = local.context
-}
-
 resource "helm_release" "kube_state_metrics" {
   count            = var.enable_kube_state_metrics ? 1 : 0
   chart            = var.ksm_config.helm_chart_name
@@ -82,7 +73,7 @@ resource "aws_prometheus_scraper" "this" {
   source {
     eks {
       cluster_arn = local.eks_cluster_arn
-      subnet_ids  = local.eks_cluster_subnet_ids
+      subnet_ids  = slice(tolist(local.eks_cluster_subnet_ids), 0, min(length(local.eks_cluster_subnet_ids), 4))
     }
   }
 

@@ -57,7 +57,8 @@ module "eks_monitoring" {
   grafana_url             = "https://${data.aws_grafana_workspace.this.endpoint}"
 
   # control the publishing of dashboards by specifying the boolean value for the variable 'enable_dashboards', default is 'true'
-  enable_dashboards = var.enable_dashboards
+  # enable_dashboards = var.enable_dashboards
+  enable_dashboards = false
 
   # creates a new Amazon Managed Prometheus workspace, defaults to true
   enable_managed_prometheus       = local.create_new_workspace

@@ -42,6 +42,7 @@ spec:
       GRAFANA_NODEEXP_DASH_URL: ${var.grafana_node_exporter_dashboard_url}
       GRAFANA_NODES_DASH_URL: ${var.grafana_nodes_dashboard_url}
       GRAFANA_WORKLOADS_DASH_URL: ${var.grafana_workloads_dashboard_url}
+      GRAFANA_FLEET_DASH_URL: ${var.grafana_fleet_dashboard_url}
 YAML
   count      = var.enable_dashboards ? 1 : 0
   depends_on = [module.external_secrets]
@@ -71,49 +72,6 @@ YAML
   count      = var.enable_apiserver_monitoring ? 1 : 0
   depends_on = [module.external_secrets]
 }
-
-# adot health dashboards
-# resource "kubectl_manifest" "adothealth_monitoring_dashboards" {
-#   yaml_body  = <<YAML
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: ${local.adothealth_monitoring_config.flux_kustomization_name}
-#   namespace: flux-system
-# spec:
-#   interval: 1m0s
-#   path: ${local.adothealth_monitoring_config.flux_kustomization_path}
-#   prune: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: ${local.adothealth_monitoring_config.flux_gitrepository_name}
-#   postBuild:
-#     substitute:
-#       GRAFANA_ADOTHEALTH_DASH_URL: ${local.adothealth_monitoring_config.dashboards.health}
-# YAML
-#   count      = var.enable_adotcollector_metrics ? 1 : 0
-#   depends_on = [module.external_secrets]
-# }
-
-# nvidia dashboards
-# resource "kubectl_manifest" "nvidia_monitoring_dashboards" {
-#   yaml_body  = <<YAML
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: ${local.nvidia_monitoring_config.flux_kustomization_name}
-#   namespace: flux-system
-# spec:
-#   interval: 1m0s
-#   path: ${local.nvidia_monitoring_config.flux_kustomization_path}
-#   prune: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: ${local.nvidia_monitoring_config.flux_gitrepository_name}
-# YAML
-#   count      = var.enable_nvidia_monitoring ? 1 : 0
-#   depends_on = [module.external_secrets]
-# }
 
 # resource "kubectl_manifest" "kubeproxy_monitoring_dashboard" {
 #   yaml_body  = <<YAML

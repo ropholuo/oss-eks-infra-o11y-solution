@@ -3,12 +3,6 @@ variable "eks_cluster_id" {
   type        = string
 }
 
-variable "enable_amazon_eks_adot" {
-  description = "Enables the ADOT Operator on the EKS Cluster"
-  type        = bool
-  default     = true
-}
-
 variable "enable_managed_prometheus" {
   description = "Creates a new Amazon Managed Service for Prometheus Workspace"
   type        = bool
@@ -55,18 +49,6 @@ variable "irsa_iam_additional_policies" {
   description = "IAM additional policies for IRSA roles"
   type        = list(string)
   default     = []
-}
-
-variable "adot_loglevel" {
-  description = "Verbosity level for ADOT collector logs. This accepts (detailed|normal|basic), see https://aws-otel.github.io/docs/components/misc-exporters for more info."
-  type        = string
-  default     = "normal"
-}
-
-variable "adot_service_telemetry_loglevel" {
-  description = "Verbosity level for ADOT service telemetry logs. See https://opentelemetry.io/docs/collector/configuration/#telemetry for more info."
-  type        = string
-  default     = "INFO"
 }
 
 variable "managed_prometheus_workspace_endpoint" {
@@ -491,6 +473,12 @@ variable "grafana_workloads_dashboard_url" {
   description = "Dashboard URL for Workloads Grafana Dashboard JSON"
   type        = string
   default     = "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/infrastructure/workloads.json"
+}
+
+variable "grafana_fleet_dashboard_url" {
+  description = "Dashboard URL for Workloads Grafana Dashboard JSON"
+  type        = string
+  default     = "https://raw.githubusercontent.com/Brandon-Kimberly/observability-best-practices/main/solutions/oss/eks-infra/v3.0.0/grafana-dashboards/infrastructure/fleet-monitoring.json"
 }
 
 variable "target_secret_name" {
