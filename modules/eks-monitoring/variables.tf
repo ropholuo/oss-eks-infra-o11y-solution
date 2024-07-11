@@ -102,13 +102,13 @@ variable "flux_kustomization_name" {
 variable "flux_gitrepository_name" {
   description = "Flux GitRepository name"
   type        = string
-  default     = "aws-observability-accelerator"
+  default     = "observability-best-practices"
 }
 
 variable "flux_gitrepository_url" {
   description = "Flux GitRepository URL"
   type        = string
-  default     = "https://github.com/aws-observability/aws-observability-accelerator"
+  default     = "https://github.com/Brandon-Kimberly/observability-best-practices"
 }
 
 variable "flux_gitrepository_branch" {
@@ -120,7 +120,7 @@ variable "flux_gitrepository_branch" {
 variable "flux_kustomization_path" {
   description = "Flux Kustomization Path"
   type        = string
-  default     = "./artifacts/grafana-operator-manifests/eks/infrastructure"
+  default     = "./solutions/oss/eks-infra/v3.0.0/infrastructure"
 }
 
 variable "enable_kube_state_metrics" {
@@ -476,9 +476,15 @@ variable "grafana_workloads_dashboard_url" {
 }
 
 variable "grafana_fleet_dashboard_url" {
-  description = "Dashboard URL for Workloads Grafana Dashboard JSON"
+  description = "Dashboard URL for Fleet Grafana Dashboard JSON"
   type        = string
   default     = "https://raw.githubusercontent.com/Brandon-Kimberly/observability-best-practices/main/solutions/oss/eks-infra/v3.0.0/grafana-dashboards/infrastructure/fleet-monitoring.json"
+}
+
+variable "grafana_logs_dashboard_url" {
+  description = "Dashboard URL for Logs Grafana Dashboard JSON"
+  type        = string
+  default     = "https://raw.githubusercontent.com/Brandon-Kimberly/observability-best-practices/main/solutions/oss/eks-infra/v3.0.0/grafana-dashboards/infrastructure/logs.json"
 }
 
 variable "target_secret_name" {

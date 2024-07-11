@@ -11,7 +11,7 @@ spec:
   interval: 5m0s
   url: ${var.flux_gitrepository_url}
   ref:
-    tag: ${var.flux_gitrepository_branch}
+    branch: main
 YAML
 
   depends_on = [module.external_secrets]
@@ -43,6 +43,7 @@ spec:
       GRAFANA_NODES_DASH_URL: ${var.grafana_nodes_dashboard_url}
       GRAFANA_WORKLOADS_DASH_URL: ${var.grafana_workloads_dashboard_url}
       GRAFANA_FLEET_DASH_URL: ${var.grafana_fleet_dashboard_url}
+      GRAFANA_LOGS_DASH_URL: ${var.grafana_logs_dashboard_url}
 YAML
   count      = var.enable_dashboards ? 1 : 0
   depends_on = [module.external_secrets]
@@ -72,25 +73,3 @@ YAML
   count      = var.enable_apiserver_monitoring ? 1 : 0
   depends_on = [module.external_secrets]
 }
-
-# resource "kubectl_manifest" "kubeproxy_monitoring_dashboard" {
-#   yaml_body  = <<YAML
-# apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
-# kind: Kustomization
-# metadata:
-#   name: ${local.kubeproxy_monitoring_config.flux_kustomization_name}
-#   namespace: flux-system
-# spec:
-#   interval: 1m0s
-#   path: ${local.kubeproxy_monitoring_config.flux_kustomization_path}
-#   prune: true
-#   sourceRef:
-#     kind: GitRepository
-#     name: ${local.kubeproxy_monitoring_config.flux_gitrepository_name}
-#   postBuild:
-#     substitute:
-#       GRAFANA_KUBEPROXY_DASH_URL: ${local.kubeproxy_monitoring_config.dashboards.default}
-# YAML
-#   count      = var.enable_dashboards ? 1 : 0
-#   depends_on = [module.external_secrets]
-# }

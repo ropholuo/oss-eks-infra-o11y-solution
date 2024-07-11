@@ -60,105 +60,18 @@ locals {
     grafana_dashboard_url = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/java/default.json"
   }
 
-  nginx_pattern_config_defaults = {
-    # disabled if options from module are disabled, by default
-    # can be overriden by providing a config
-    enable_alerting_rules  = var.enable_alerting_rules
-    enable_recording_rules = var.enable_recording_rules
-    enable_dashboards      = var.enable_dashboards
-
-    scrape_sample_limit = 1000
-
-    flux_gitrepository_name   = var.flux_gitrepository_name
-    flux_gitrepository_url    = var.flux_gitrepository_url
-    flux_gitrepository_branch = var.flux_gitrepository_branch
-    flux_kustomization_name   = "grafana-dashboards-nginx"
-    flux_kustomization_path   = "./artifacts/grafana-operator-manifests/eks/nginx"
-
-    managed_prometheus_workspace_id = local.managed_prometheus_workspace_id
-    prometheus_metrics_endpoint     = "/metrics"
-
-    grafana_dashboard_url = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/nginx/nginx.json"
-  }
-
-  nginx_pattern_config = {
-    # Merge input variable with defaults and rebuild with non-null values
-    for k, v in merge(local.nginx_pattern_config_defaults, var.nginx_config) : k => v != null ? v : local.nginx_pattern_config_defaults[k]
-  }
-
-  istio_pattern_config = {
-    # disabled if options from module are disabled, by default
-    # can be overriden by providing a config
-    enable_alerting_rules  = var.enable_alerting_rules
-    enable_recording_rules = var.enable_recording_rules
-    enable_dashboards      = var.enable_dashboards
-
-    scrape_sample_limit = 1000
-
-    flux_gitrepository_name   = var.flux_gitrepository_name
-    flux_gitrepository_url    = var.flux_gitrepository_url
-    flux_gitrepository_branch = var.flux_gitrepository_branch
-    flux_kustomization_name   = "grafana-dashboards-istio"
-    flux_kustomization_path   = "./artifacts/grafana-operator-manifests/eks/istio"
-
-    managed_prometheus_workspace_id = local.managed_prometheus_workspace_id
-    prometheus_metrics_endpoint     = "/metrics"
-
-    dashboards = {
-      cp          = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/istio/istio-control-plane-dashboard.json"
-      mesh        = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/istio/istio-mesh-dashboard.json"
-      performance = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/istio/istio-performance-dashboard.json"
-      service     = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/istio/istio-service-dashboard.json"
-    }
-  }
-
   apiserver_monitoring_config = {
     # can be overriden by providing a config
     flux_gitrepository_name   = try(var.apiserver_monitoring_config.flux_gitrepository_name, var.flux_gitrepository_name)
     flux_gitrepository_url    = try(var.apiserver_monitoring_config.flux_gitrepository_url, var.flux_gitrepository_url)
     flux_gitrepository_branch = try(var.apiserver_monitoring_config.flux_gitrepository_branch, var.flux_gitrepository_branch)
     flux_kustomization_name   = try(var.apiserver_monitoring_config.flux_kustomization_name, "grafana-dashboards-apiserver")
-    flux_kustomization_path   = try(var.apiserver_monitoring_config.flux_kustomization_path, "./artifacts/grafana-operator-manifests/eks/apiserver")
+    flux_kustomization_path   = try(var.apiserver_monitoring_config.flux_kustomization_path, "./solutions/oss/eks-infra/v3.0.0/apiserver")
 
     dashboards = {
       basic           = try(var.apiserver_monitoring_config.dashboards.basic, "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/apiserver/apiserver-basic.json")
       advanced        = try(var.apiserver_monitoring_config.dashboards.advanced, "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/apiserver/apiserver-advanced.json")
       troubleshooting = try(var.apiserver_monitoring_config.dashboards.troubleshooting, "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/apiserver/apiserver-troubleshooting.json")
-    }
-  }
-
-  adothealth_monitoring_config = {
-    # can be overriden by providing a config
-    flux_gitrepository_name   = try(var.adothealth_monitoring_config.flux_gitrepository_name, var.flux_gitrepository_name)
-    flux_gitrepository_url    = try(var.adothealth_monitoring_config.flux_gitrepository_url, var.flux_gitrepository_url)
-    flux_gitrepository_branch = try(var.adothealth_monitoring_config.flux_gitrepository_branch, var.flux_gitrepository_branch)
-    flux_kustomization_name   = try(var.adothealth_monitoring_config.flux_kustomization_name, "grafana-dashboards-adothealth")
-    flux_kustomization_path   = try(var.adothealth_monitoring_config.flux_kustomization_path, "./artifacts/grafana-operator-manifests/eks/adot")
-
-    dashboards = {
-      health = try(var.adothealth_monitoring_config.dashboards.health, "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/adot/adothealth.json")
-    }
-  }
-
-  nvidia_monitoring_config = {
-    # can be overriden by providing a config
-    flux_gitrepository_name   = try(var.nvidia_monitoring_config.flux_gitrepository_name, var.flux_gitrepository_name)
-    flux_gitrepository_url    = try(var.nvidia_monitoring_config.flux_gitrepository_url, var.flux_gitrepository_url)
-    flux_gitrepository_branch = try(var.nvidia_monitoring_config.flux_gitrepository_branch, var.flux_gitrepository_branch)
-    flux_kustomization_name   = try(var.nvidia_monitoring_config.flux_kustomization_name, "grafana-dashboards-adothealth")
-    flux_kustomization_path   = try(var.nvidia_monitoring_config.flux_kustomization_path, "./artifacts/grafana-operator-manifests/eks/gpu")
-  }
-
-  kubeproxy_monitoring_config = {
-    # can be overriden by providing a config
-    flux_gitrepository_name   = try(var.kubeproxy_monitoring_config.flux_gitrepository_name, var.flux_gitrepository_name)
-    flux_gitrepository_url    = try(var.kubeproxy_monitoring_config.flux_gitrepository_url, var.flux_gitrepository_url)
-    flux_gitrepository_branch = try(var.kubeproxy_monitoring_config.flux_gitrepository_branch, var.flux_gitrepository_branch)
-    flux_kustomization_name   = try(var.kubeproxy_monitoring_config.flux_kustomization_name, "grafana-dashboards-kubeproxy")
-    flux_kustomization_path   = try(var.kubeproxy_monitoring_config.flux_kustomization_path, "./artifacts/grafana-operator-manifests/eks/kube-proxy")
-
-    dashboards = {
-      default = try(var.kubeproxy_monitoring_config.dashboards.default, "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/kube-proxy/kube-proxy.json")
     }
   }
 }
