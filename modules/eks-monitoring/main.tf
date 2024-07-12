@@ -99,31 +99,16 @@ module "external_secrets" {
   depends_on = [resource.helm_release.grafana_operator]
 }
 
+module "amazon_cloudwatch_observability" {
+  source = "./add-ons/amazon-cloudwatch-observability"
+  count  = var.enable_logs ? 1 : 0
+
+  addon_context = local.context
+}
+
 # module "java_monitoring" {
 #   source = "./patterns/java"
 #   count  = var.enable_java ? 1 : 0
 
 #   pattern_config = coalesce(var.java_config, local.java_pattern_config)
-# }
-
-# module "nginx_monitoring" {
-#   source = "./patterns/nginx"
-#   count  = var.enable_nginx ? 1 : 0
-
-#   pattern_config = local.nginx_pattern_config
-# }
-
-# module "istio_monitoring" {
-#   source = "./patterns/istio"
-#   count  = var.enable_istio ? 1 : 0
-
-#   pattern_config = coalesce(var.istio_config, local.istio_pattern_config)
-# }
-
-# module "fluentbit_logs" {
-#   source = "./add-ons/aws-for-fluentbit"
-#   count  = var.enable_logs ? 1 : 0
-
-#   cw_log_retention_days = var.logs_config.cw_log_retention_days
-#   addon_context         = local.context
 # }

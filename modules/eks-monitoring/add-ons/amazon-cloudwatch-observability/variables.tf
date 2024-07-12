@@ -1,28 +1,3 @@
-variable "helm_config" {
-  description = "Helm provider config aws_for_fluent_bit."
-  type        = any
-  default     = {}
-}
-
-variable "cw_log_retention_days" {
-  description = "FluentBit CloudWatch Log group retention period"
-  type        = number
-  default     = 90
-}
-
-variable "refresh_interval" {
-  description = "FluentBit input refresh interval"
-  type        = number
-  default     = 60
-}
-
-
-variable "manage_via_gitops" {
-  type        = bool
-  description = "Determines if the add-on should be managed via GitOps."
-  default     = false
-}
-
 variable "irsa_policies" {
   description = "Additional IAM policies for a IAM role for service accounts"
   type        = list(string)
@@ -40,8 +15,30 @@ variable "addon_context" {
     eks_cluster_id                 = string
     eks_oidc_issuer_url            = string
     eks_oidc_provider_arn          = string
-    tags                           = map(string)
     irsa_iam_role_path             = string
     irsa_iam_permissions_boundary  = string
+    tags                           = map(string)
   })
+}
+
+variable "cloudwatch_observability_config" {
+  description = "Configuration for the Amazon CloudWatch Observability addon"
+  type        = any
+  default     = {
+    "agent" : {
+      "config" : {
+        "logs" : {
+          "metrics_collected" : {
+            "application_signals" : {},
+            "kubernetes" : {}
+          }
+        },
+        "traces" : {
+          "traces_collected" : {
+            "application_signals": {}
+          }
+        }
+      }
+    }
+  }
 }
