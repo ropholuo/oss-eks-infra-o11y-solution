@@ -33,13 +33,12 @@ locals {
   eks_cluster_endpoint = data.aws_eks_cluster.this.endpoint
   create_new_workspace = var.managed_prometheus_workspace_id == "" ? true : false
   tags = {
-    Source = "github.com/aws-observability/terraform-aws-observability-accelerator"
+    Source = "github.com/aws-observability/observability-best-practices"
   }
 }
 
 module "eks_monitoring" {
   source = "../../modules/eks-monitoring"
-  # source = "github.com/aws-observability/terraform-aws-observability-accelerator//modules/eks-monitoring?ref=v2.0.0"
 
   eks_cluster_id = var.eks_cluster_id
 
