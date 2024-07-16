@@ -20,11 +20,7 @@ terraform {
     }
   }
 
-  ##  Used for end-to-end testing on project; update to suit your needs
-    # key    = "state/${local.eks_cluster_endpoint}/terraform.tfstate"
   backend "s3" {
-    bucket = "cinch-solution-tfstate"
-    region = "us-west-2"
   }
 
 }
