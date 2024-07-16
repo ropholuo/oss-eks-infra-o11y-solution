@@ -8,11 +8,6 @@ output "eks_cluster_id" {
   value       = var.eks_cluster_id
 }
 
-# output "adot_irsa_arn" {
-#   description = "IRSA Arn for ADOT"
-#   value       = module.helm_addon.irsa_arn
-# }
-
 output "managed_prometheus_workspace_endpoint" {
   description = "Amazon Managed Prometheus workspace endpoint"
   value       = local.managed_prometheus_workspace_endpoint

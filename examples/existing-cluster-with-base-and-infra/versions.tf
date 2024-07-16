@@ -20,11 +20,11 @@ terraform {
     }
   }
 
-  # ##  Used for end-to-end testing on project; update to suit your needs
-  # backend "s3" {
-  #   bucket = "aws-observability-accelerator-terraform-states"
-  #   region = "us-west-2"
-  #   key    = "e2e/existing-cluster-with-base-and-infra/terraform.tfstate"
-  # }
+  ##  Used for end-to-end testing on project; update to suit your needs
+    # key    = "state/${local.eks_cluster_endpoint}/terraform.tfstate"
+  backend "s3" {
+    bucket = "cinch-solution-tfstate"
+    region = "us-west-2"
+  }
 
 }
