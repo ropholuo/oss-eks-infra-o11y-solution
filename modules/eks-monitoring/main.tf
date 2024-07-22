@@ -105,10 +105,3 @@ module "amazon_cloudwatch_observability" {
 
   addon_context = local.context
 }
-
-# module "java_monitoring" {
-#   source = "./patterns/java"
-#   count  = var.enable_java ? 1 : 0
-
-#   pattern_config = coalesce(var.java_config, local.java_pattern_config)
-# }
