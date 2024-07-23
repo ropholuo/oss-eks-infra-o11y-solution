@@ -31,3 +31,9 @@ variable "enable_dashboards" {
   type        = bool
   default     = true
 }
+
+variable "jmx_exporter_img_url" {
+  description = "URL of the JMX exporter image"
+  type        = string
+  default     = ""
+}

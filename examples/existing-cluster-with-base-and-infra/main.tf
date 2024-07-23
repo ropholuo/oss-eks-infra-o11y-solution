@@ -74,4 +74,6 @@ module "eks_monitoring" {
   enable_logs = true
 
   tags = local.tags
+
+  jmx_exporter_img_url = var.jmx_exporter_img_url
 }

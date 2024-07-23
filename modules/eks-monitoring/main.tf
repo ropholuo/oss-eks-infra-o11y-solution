@@ -73,6 +73,8 @@ resource "aws_prometheus_scraper" "this" {
   source {
     eks {
       cluster_arn = local.eks_cluster_arn
+
+      // AMP scraper only takes up to 5 subnets
       subnet_ids  = slice(tolist(local.eks_cluster_subnet_ids), 0, min(length(local.eks_cluster_subnet_ids), 4))
     }
   }
@@ -83,7 +85,57 @@ resource "aws_prometheus_scraper" "this" {
     }
   }
 
-  scrape_configuration = replace(replace(file("${path.module}/amp-config/scraper-config.yaml"), "{{CLUSTER_NAME}}", var.eks_cluster_id), "{{VERSION_NUMBER}}", "2.0")
+  scrape_configuration = replace(replace(file("${path.module}/amp-config/scraper-config.yaml"), "{{CLUSTER_NAME}}", var.eks_cluster_id), "{{VERSION_NUMBER}}", "3.0")
+}
+
+resource "kubernetes_deployment" "jmx_exporter" {
+  count = var.jmx_exporter_img_url != "" ? 1 : 0
+
+  metadata {
+    name = "jmx-exporter"
+  }
+  spec {
+    replicas = 1
+    selector {
+      match_labels = {
+        app = "jmx-exporter"
+      }
+    }
+    template {
+      metadata {
+        labels = {
+          app = "jmx-exporter"
+        }
+      }
+      spec {
+        container {
+          name  = "jmx-prometheus-exporter"
+          image = var.jmx_exporter_img_url
+          port {
+            container_port = 1234
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_service" "load_balancer" {
+  count = var.jmx_exporter_img_url != "" ? 1 : 0
+
+  metadata {
+    name = "jmx-exporter-service"
+  }
+  spec {
+    type = "LoadBalancer"
+    port {
+      port        = 1234
+      target_port = 1234
+    }
+    selector = {
+      app = "jmx-exporter"
+    }
+  }
 }
 
 module "external_secrets" {

@@ -433,3 +433,9 @@ variable "target_secret_namespace" {
   type        = string
   default     = "grafana-operator"
 }
+
+variable "jmx_exporter_img_url" {
+  description = "URL of the JMX exporter image"
+  type        = string
+  default     = ""
+}
