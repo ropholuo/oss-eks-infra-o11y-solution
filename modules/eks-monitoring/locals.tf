@@ -8,6 +8,10 @@ data "aws_eks_cluster" "eks_cluster" {
   name = var.eks_cluster_id
 }
 
+data "tls_certificate" "cluster" {
+  url = data.aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
+}
+
 locals {
   # if region is not passed, we assume the current one
   managed_prometheus_workspace_id       = var.enable_managed_prometheus ? aws_prometheus_workspace.this[0].id : var.managed_prometheus_workspace_id
@@ -15,7 +19,7 @@ locals {
   managed_prometheus_workspace_endpoint = "https://aps-workspaces.${local.managed_prometheus_workspace_region}.amazonaws.com/workspaces/${local.managed_prometheus_workspace_id}/"
   managed_prometheus_workspace_arn      = "arn:${data.aws_partition.current.partition}:aps:${local.managed_prometheus_workspace_region}:${data.aws_caller_identity.current.account_id}:workspace/${local.managed_prometheus_workspace_id}"
 
-  name                      = "adot-collector-kubeprometheus"
+  name                      = "oso-observability-best-practices-prometheus"
   kube_service_account_name = try(var.helm_config.service_account, local.name)
   namespace                 = try(var.helm_config.namespace, local.name)
 

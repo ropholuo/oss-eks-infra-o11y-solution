@@ -69,11 +69,25 @@ resource "helm_release" "grafana_operator" {
   max_history      = 3
 }
 
+resource "aws_iam_openid_connect_provider" "cluster" {
+  count = data.aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer != "" ? 1 : 0
+
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.cluster.certificates[0].sha1_fingerprint]
+  url             = data.aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
+
+  lifecycle {
+    ignore_changes = [url, thumbprint_list]
+  }
+}
+
 resource "aws_prometheus_scraper" "this" {
   source {
     eks {
       cluster_arn = local.eks_cluster_arn
-      subnet_ids  = slice(tolist(local.eks_cluster_subnet_ids), 0, min(length(local.eks_cluster_subnet_ids), 4))
+      
+      // AMP scraper only accepts up to 5 subnets
+      subnet_ids  = slice(tolist(local.eks_cluster_subnet_ids), 0, min(length(local.eks_cluster_subnet_ids), 5))
     }
   }
 
@@ -105,10 +119,3 @@ module "amazon_cloudwatch_observability" {
 
   addon_context = local.context
 }
-
-# module "java_monitoring" {
-#   source = "./patterns/java"
-#   count  = var.enable_java ? 1 : 0
-
-#   pattern_config = coalesce(var.java_config, local.java_pattern_config)
-# }
