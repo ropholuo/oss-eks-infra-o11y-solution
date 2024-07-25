@@ -106,6 +106,10 @@ resource "kubernetes_deployment" "jmx_exporter" {
         labels = {
           app = "jmx-exporter"
         }
+        annotations = {
+          "prometheus.io/scrape" = "true"
+          "prometheus.io/port"   = "1234"
+        }
       }
       spec {
         container {
