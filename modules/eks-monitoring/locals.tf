@@ -43,27 +43,6 @@ locals {
     irsa_iam_permissions_boundary  = var.irsa_iam_permissions_boundary
   }
 
-  java_pattern_config = {
-    # disabled if options from module are disabled, by default
-    # can be overriden by providing a config
-    enable_alerting_rules  = var.enable_alerting_rules
-    enable_recording_rules = var.enable_recording_rules
-    enable_dashboards      = var.enable_dashboards # disable flux kustomization if dashboards are disabled
-
-    scrape_sample_limit = 1000
-
-    flux_gitrepository_name   = var.flux_gitrepository_name
-    flux_gitrepository_url    = var.flux_gitrepository_url
-    flux_gitrepository_branch = var.flux_gitrepository_branch
-    flux_kustomization_name   = "grafana-dashboards-java"
-    flux_kustomization_path   = "./artifacts/grafana-operator-manifests/eks/java"
-
-    managed_prometheus_workspace_id = local.managed_prometheus_workspace_id
-    prometheus_metrics_endpoint     = "/metrics"
-
-    grafana_dashboard_url = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/java/default.json"
-  }
-
   apiserver_monitoring_config = {
     # can be overriden by providing a config
     flux_gitrepository_name   = try(var.apiserver_monitoring_config.flux_gitrepository_name, var.flux_gitrepository_name)

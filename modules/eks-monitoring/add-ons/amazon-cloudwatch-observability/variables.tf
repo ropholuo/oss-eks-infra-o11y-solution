@@ -21,6 +21,7 @@ variable "addon_context" {
   })
 }
 
+// Configured to ONLY collect logs without metrics
 variable "cloudwatch_observability_config" {
   description = "Configuration for the Amazon CloudWatch Observability addon"
   type        = any
