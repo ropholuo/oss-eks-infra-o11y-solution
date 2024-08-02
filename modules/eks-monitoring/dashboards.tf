@@ -1,17 +1,19 @@
-resource "kubectl_manifest" "flux_gitrepository" {
+resource "kubectl_manifest" "flux_bucket" {
   count = var.enable_dashboards ? 1 : 0
 
   yaml_body = <<YAML
 apiVersion: source.toolkit.fluxcd.io/v1beta2
-kind: GitRepository
+kind: Bucket
 metadata:
-  name: ${var.flux_gitrepository_name}
+  name: ${var.flux_bucket_name}
   namespace: flux-system
 spec:
   interval: 5m0s
-  url: ${var.flux_gitrepository_url}
-  ref:
-    branch: main
+  provider: aws
+  bucketName: ${var.flux_bucket_name}
+  region: ${var.flux_bucket_region}
+  bucketPath: ${var.flux_bucket_path}
+  endpoint: s3.amazonaws.com
 YAML
 
   depends_on = [module.external_secrets]
@@ -29,8 +31,8 @@ spec:
   path: ${var.flux_kustomization_path}
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: ${var.flux_gitrepository_name}
+    kind: Bucket
+    name: ${var.flux_bucket_name}
   postBuild:
     substitute:
       AMG_AWS_REGION: ${local.managed_prometheus_workspace_region}
@@ -62,8 +64,8 @@ spec:
   path: ${local.apiserver_monitoring_config.flux_kustomization_path}
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: ${local.apiserver_monitoring_config.flux_gitrepository_name}
+    kind: Bucket
+    name: ${local.apiserver_monitoring_config.flux_bucket_name}
   postBuild:
     substitute:
       GRAFANA_APISERVER_BASIC_DASH_URL: ${local.apiserver_monitoring_config.dashboards.basic}

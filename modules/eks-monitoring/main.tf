@@ -59,6 +59,77 @@ resource "helm_release" "fluxcd" {
   }
 }
 
+data "aws_iam_policy_document" "flux_source_controller_policy" {
+  statement {
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = [
+      "arn:aws:s3:::${var.flux_bucket_name}",
+    ]
+  }
+
+  statement {
+    actions = [
+      "s3:GetObject",
+    ]
+    resources = [
+      "arn:aws:s3:::${var.flux_bucket_name}/*",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "flux_source_controller_policy" {
+  name        = "flux-source-controller-policy"
+  description = "Policy for Flux Source Controller to access S3 bucket"
+  policy      = data.aws_iam_policy_document.flux_source_controller_policy.json
+}
+
+data "aws_iam_policy_document" "flux_source_controller_trust_policy" {
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.cluster[0].arn]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.cluster[0].url, "https://", "")}:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.cluster[0].url, "https://", "")}:sub"
+      values   = ["system:serviceaccount:flux-system:source-controller"]
+    }
+  }
+}
+
+resource "aws_iam_role" "flux_source_controller_role" {
+  name               = "flux-source-controller-role"
+  assume_role_policy = data.aws_iam_policy_document.flux_source_controller_trust_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "flux_source_controller_policy_attachment" {
+  role       = aws_iam_role.flux_source_controller_role.name
+  policy_arn = aws_iam_policy.flux_source_controller_policy.arn
+}
+
+resource "kubernetes_service_account" "flux_source_controller" {
+  metadata {
+    name      = "source-controller"
+    namespace = "flux-system"
+    annotations = {
+      "eks.amazonaws.com/role-arn"     = aws_iam_role.flux_source_controller_role.arn
+      "meta.helm.sh/release-name"      = var.flux_config.helm_release_name
+      "meta.helm.sh/release-namespace" = var.flux_config.k8s_namespace
+    }
+    labels = {
+      "app.kubernetes.io/managed-by" = "Helm"
+    }
+  }
+}
+
 resource "helm_release" "grafana_operator" {
   count            = var.enable_grafana_operator ? 1 : 0
   chart            = var.go_config.helm_chart
@@ -81,24 +152,24 @@ resource "aws_iam_openid_connect_provider" "cluster" {
   }
 }
 
-resource "aws_prometheus_scraper" "this" {
-  source {
-    eks {
-      cluster_arn = local.eks_cluster_arn
-      
-      // AMP scraper only accepts up to 5 subnets
-      subnet_ids  = slice(tolist(local.eks_cluster_subnet_ids), 0, min(length(local.eks_cluster_subnet_ids), 5))
-    }
-  }
+# resource "aws_prometheus_scraper" "this" {
+#   source {
+#     eks {
+#       cluster_arn = local.eks_cluster_arn
 
-  destination {
-    amp {
-      workspace_arn = local.managed_prometheus_workspace_arn
-    }
-  }
+#       // AMP scraper only accepts up to 5 subnets
+#       subnet_ids = slice(tolist(local.eks_cluster_subnet_ids), 0, min(length(local.eks_cluster_subnet_ids), 5))
+#     }
+#   }
 
-  scrape_configuration = replace(replace(file("${path.module}/amp-config/scraper-config.yaml"), "{{CLUSTER_NAME}}", var.eks_cluster_id), "{{VERSION_NUMBER}}", "2.0")
-}
+#   destination {
+#     amp {
+#       workspace_arn = local.managed_prometheus_workspace_arn
+#     }
+#   }
+
+#   scrape_configuration = replace(replace(file("${path.module}/amp-config/scraper-config.yaml"), "{{CLUSTER_NAME}}", var.eks_cluster_id), "{{VERSION_NUMBER}}", "2.0")
+# }
 
 module "external_secrets" {
   source = "./add-ons/external-secrets"

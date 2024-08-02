@@ -45,16 +45,14 @@ locals {
 
   apiserver_monitoring_config = {
     # can be overriden by providing a config
-    flux_gitrepository_name   = try(var.apiserver_monitoring_config.flux_gitrepository_name, var.flux_gitrepository_name)
-    flux_gitrepository_url    = try(var.apiserver_monitoring_config.flux_gitrepository_url, var.flux_gitrepository_url)
-    flux_gitrepository_branch = try(var.apiserver_monitoring_config.flux_gitrepository_branch, var.flux_gitrepository_branch)
+    flux_bucket_name   = try(var.apiserver_monitoring_config.flux_bucket_name, var.flux_bucket_name)
     flux_kustomization_name   = try(var.apiserver_monitoring_config.flux_kustomization_name, "grafana-dashboards-apiserver")
-    flux_kustomization_path   = try(var.apiserver_monitoring_config.flux_kustomization_path, "./solutions/oss/eks-infra/v3.0.0/apiserver")
+    flux_kustomization_path   = try(var.apiserver_monitoring_config.flux_kustomization_path, "EKS/OSS/CDK/v3.0.0/apiserver")
 
     dashboards = {
-      basic           = try(var.apiserver_monitoring_config.dashboards.basic, "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/apiserver/apiserver-basic.json")
-      advanced        = try(var.apiserver_monitoring_config.dashboards.advanced, "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/apiserver/apiserver-advanced.json")
-      troubleshooting = try(var.apiserver_monitoring_config.dashboards.troubleshooting, "https://raw.githubusercontent.com/aws-observability/observability-best-practices/main/solutions/oss/eks-infra/v2.0.0/grafana-dashboards/apiserver/apiserver-troubleshooting.json")
+      basic           = try(var.apiserver_monitoring_config.dashboards.basic, var.grafana_apiserver_basic_dashboard_url)
+      advanced        = try(var.apiserver_monitoring_config.dashboards.advanced, var.grafana_apiserver_advanced_dashboard_url)
+      troubleshooting = try(var.apiserver_monitoring_config.dashboards.troubleshooting, var.grafana_apiserver_troubleshooting_dashboard_url)
     }
   }
 }
