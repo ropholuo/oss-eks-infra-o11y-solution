@@ -152,24 +152,24 @@ resource "aws_iam_openid_connect_provider" "cluster" {
   }
 }
 
-# resource "aws_prometheus_scraper" "this" {
-#   source {
-#     eks {
-#       cluster_arn = local.eks_cluster_arn
+resource "aws_prometheus_scraper" "this" {
+  source {
+    eks {
+      cluster_arn = local.eks_cluster_arn
 
-#       // AMP scraper only accepts up to 5 subnets
-#       subnet_ids = slice(tolist(local.eks_cluster_subnet_ids), 0, min(length(local.eks_cluster_subnet_ids), 5))
-#     }
-#   }
+      // AMP scraper only accepts up to 5 subnets
+      subnet_ids = slice(tolist(local.eks_cluster_subnet_ids), 0, min(length(local.eks_cluster_subnet_ids), 5))
+    }
+  }
 
-#   destination {
-#     amp {
-#       workspace_arn = local.managed_prometheus_workspace_arn
-#     }
-#   }
+  destination {
+    amp {
+      workspace_arn = local.managed_prometheus_workspace_arn
+    }
+  }
 
-#   scrape_configuration = replace(replace(file("${path.module}/amp-config/scraper-config.yaml"), "{{CLUSTER_NAME}}", var.eks_cluster_id), "{{VERSION_NUMBER}}", "2.0")
-# }
+  scrape_configuration = replace(replace(file("${path.module}/amp-config/scraper-config.yaml"), "{{CLUSTER_NAME}}", var.eks_cluster_id), "{{VERSION_NUMBER}}", "2.0")
+}
 
 module "external_secrets" {
   source = "./add-ons/external-secrets"
