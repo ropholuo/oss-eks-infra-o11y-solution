@@ -14,7 +14,7 @@ spec:
   region: ${var.flux_bucket_region}
   bucketPath: ${var.flux_bucket_path}
   ignore: |
-    Kafka_JVM_EC2/CloudWatch/CFN/versions/1.0.0/CFN.json
+    Kafka_JVM_EC2/
   endpoint: s3.amazonaws.com
 YAML
 
