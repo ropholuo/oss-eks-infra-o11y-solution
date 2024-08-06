@@ -41,6 +41,10 @@ resource "helm_release" "prometheus_node_exporter" {
   }
 }
 
+/**
+ *  FluxCD
+ */
+
 resource "helm_release" "fluxcd" {
   count            = var.enable_fluxcd ? 1 : 0
   chart            = var.flux_config.helm_chart_name
@@ -130,6 +134,10 @@ resource "kubernetes_service_account" "flux_source_controller" {
   }
 }
 
+/**
+ *  Grafana Operator
+ */
+
 resource "helm_release" "grafana_operator" {
   count            = var.enable_grafana_operator ? 1 : 0
   chart            = var.go_config.helm_chart
@@ -152,13 +160,31 @@ resource "aws_iam_openid_connect_provider" "cluster" {
   }
 }
 
+/**
+ *  Prometheus Scraper
+ */
+
+// AMP Scraper only accepts unique subnet per AZ
+locals {
+  subnets_by_az = { for subnet in local.eks_cluster_subnet_ids : subnet => data.aws_subnet.this[subnet].availability_zone }
+  unique_azs    = distinct(values(local.subnets_by_az))
+  filtered_subnets = [
+    for az in local.unique_azs :
+    keys(local.subnets_by_az)[index(values(local.subnets_by_az), az)]
+  ]
+}
+
+data "aws_subnet" "this" {
+  for_each = toset(local.eks_cluster_subnet_ids)
+  id       = each.value
+}
+
 resource "aws_prometheus_scraper" "this" {
   source {
     eks {
       cluster_arn = local.eks_cluster_arn
-
-      // AMP scraper only accepts up to 5 subnets
-      subnet_ids = slice(tolist(local.eks_cluster_subnet_ids), 0, min(length(local.eks_cluster_subnet_ids), 5))
+      // AMP Scraper only accepts up to 5 subnets
+      subnet_ids = slice(local.filtered_subnets, 0, min(length(local.filtered_subnets), 5))
     }
   }
 
@@ -171,6 +197,10 @@ resource "aws_prometheus_scraper" "this" {
   scrape_configuration = replace(replace(file("${path.module}/amp-config/scraper-config.yaml"), "{{CLUSTER_NAME}}", var.eks_cluster_id), "{{VERSION_NUMBER}}", "2.0")
 }
 
+/**
+ *  External Secrets
+ */
+ 
 module "external_secrets" {
   source = "./add-ons/external-secrets"
   count  = var.enable_external_secrets ? 1 : 0
