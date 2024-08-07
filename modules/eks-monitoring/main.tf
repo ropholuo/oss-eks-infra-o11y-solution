@@ -61,6 +61,10 @@ resource "helm_release" "fluxcd" {
       value = set.value
     }
   }
+
+  depends_on = [
+    kubernetes_service_account.flux_source_controller
+  ]
 }
 
 data "aws_iam_policy_document" "flux_source_controller_policy" {
@@ -84,7 +88,7 @@ data "aws_iam_policy_document" "flux_source_controller_policy" {
 }
 
 resource "aws_iam_policy" "flux_source_controller_policy" {
-  name        = "flux-source-controller-policy"
+  name        = "flux-source-controller-policy-${var.eks_cluster_id}"
   description = "Policy for Flux Source Controller to access S3 bucket"
   policy      = data.aws_iam_policy_document.flux_source_controller_policy.json
 }
@@ -110,7 +114,7 @@ data "aws_iam_policy_document" "flux_source_controller_trust_policy" {
 }
 
 resource "aws_iam_role" "flux_source_controller_role" {
-  name               = "flux-source-controller-role"
+  name               = "flux-source-controller-role-${var.eks_cluster_id}"
   assume_role_policy = data.aws_iam_policy_document.flux_source_controller_trust_policy.json
 }
 
