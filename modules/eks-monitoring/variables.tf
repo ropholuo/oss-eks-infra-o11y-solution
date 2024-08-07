@@ -96,8 +96,7 @@ variable "enable_dashboards" {
 variable "flux_bucket_name" {
   description = "Flux bucket name"
   type        = string
-  # default     = "aws-observability-solutions"
-  default = "obs-solutions"
+  default     = "aws-observability-solutions"
 }
 
 variable "flux_bucket_region" {
