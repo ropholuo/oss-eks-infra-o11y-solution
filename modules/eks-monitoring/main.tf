@@ -98,16 +98,16 @@ data "aws_iam_policy_document" "flux_source_controller_trust_policy" {
     actions = ["sts:AssumeRoleWithWebIdentity"]
     principals {
       type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.cluster[0].arn]
+      identifiers = [local.oidc_provider.arn]
     }
     condition {
       test     = "StringEquals"
-      variable = "${replace(aws_iam_openid_connect_provider.cluster[0].url, "https://", "")}:aud"
+      variable = "${replace(local.oidc_provider.url, "https://", "")}:aud"
       values   = ["sts.amazonaws.com"]
     }
     condition {
       test     = "StringEquals"
-      variable = "${replace(aws_iam_openid_connect_provider.cluster[0].url, "https://", "")}:sub"
+      variable = "${replace(local.oidc_provider.url, "https://", "")}:sub"
       values   = ["system:serviceaccount:flux-system:source-controller"]
     }
   }
@@ -152,23 +152,27 @@ resource "helm_release" "grafana_operator" {
   max_history      = 3
 }
 
+data "aws_iam_openid_connect_provider" "cluster" {
+  url = data.aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
+}
+
 resource "aws_iam_openid_connect_provider" "cluster" {
-  count = data.aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer != "" ? 1 : 0
+  count = data.aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer != "" && data.aws_iam_openid_connect_provider.cluster.id == "" ? 1 : 0
 
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = [data.tls_certificate.cluster.certificates[0].sha1_fingerprint]
   url             = data.aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
+}
 
-  lifecycle {
-    ignore_changes = [url, thumbprint_list]
-  }
+locals {
+  oidc_provider = length(aws_iam_openid_connect_provider.cluster) > 0 ? aws_iam_openid_connect_provider.cluster[0] : data.aws_iam_openid_connect_provider.cluster
 }
 
 /**
  *  Prometheus Scraper
  */
 
-// AMP Scraper only accepts unique subnet per AZ
+// AMP Scraper only accept unique subnet per AZ
 locals {
   subnets_by_az = { for subnet in local.eks_cluster_subnet_ids : subnet => data.aws_subnet.this[subnet].availability_zone }
   unique_azs    = distinct(values(local.subnets_by_az))
@@ -187,7 +191,7 @@ resource "aws_prometheus_scraper" "this" {
   source {
     eks {
       cluster_arn = local.eks_cluster_arn
-      // AMP Scraper only accepts up to 5 subnets
+      // AMP Scraper only accept up to 5 subnets
       subnet_ids = slice(local.filtered_subnets, 0, min(length(local.filtered_subnets), 5))
     }
   }
@@ -198,7 +202,7 @@ resource "aws_prometheus_scraper" "this" {
     }
   }
 
-  scrape_configuration = replace(replace(file("${path.module}/amp-config/scraper-config.yaml"), "{{CLUSTER_NAME}}", var.eks_cluster_id), "{{VERSION_NUMBER}}", "2.0")
+  scrape_configuration = replace(replace(file("${path.module}/amp-config/scraper-config.yaml"), "{{CLUSTER_NAME}}", var.eks_cluster_id), "{{VERSION_NUMBER}}", "3.0")
 }
 
 /**
