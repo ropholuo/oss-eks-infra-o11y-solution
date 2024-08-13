@@ -12,9 +12,7 @@ spec:
   provider: aws
   bucketName: ${var.flux_bucket_name}
   region: ${var.flux_bucket_region}
-  bucketPath: ${var.flux_bucket_path}
-  ignore: |
-    Kafka_JVM_EC2/
+  prefix: ${var.flux_bucket_path}
   endpoint: s3.amazonaws.com
 YAML
 
