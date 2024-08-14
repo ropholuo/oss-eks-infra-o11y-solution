@@ -51,22 +51,9 @@ variable "irsa_iam_additional_policies" {
   default     = []
 }
 
-variable "managed_prometheus_workspace_endpoint" {
-  description = "Amazon Managed Prometheus Workspace Endpoint"
-  type        = string
-  default     = ""
-}
-
-variable "managed_prometheus_workspace_id" {
+variable "managed_prometheus_workspace_arn" {
   description = "Amazon Managed Prometheus Workspace ID"
   type        = string
-  default     = null
-}
-
-variable "managed_prometheus_workspace_region" {
-  description = "Amazon Managed Prometheus Workspace's Region"
-  type        = string
-  default     = null
 }
 
 variable "managed_prometheus_cross_account_role" {

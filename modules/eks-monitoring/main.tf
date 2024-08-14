@@ -1,10 +1,3 @@
-resource "aws_prometheus_workspace" "this" {
-  count = var.enable_managed_prometheus ? 1 : 0
-
-  alias = local.name
-  tags  = var.tags
-}
-
 resource "helm_release" "kube_state_metrics" {
   count            = var.enable_kube_state_metrics ? 1 : 0
   chart            = var.ksm_config.helm_chart_name
@@ -198,7 +191,7 @@ resource "aws_prometheus_scraper" "this" {
 
   destination {
     amp {
-      workspace_arn = local.managed_prometheus_workspace_arn
+      workspace_arn = var.managed_prometheus_workspace_arn
     }
   }
 

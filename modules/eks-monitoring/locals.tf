@@ -13,11 +13,10 @@ data "tls_certificate" "cluster" {
 }
 
 locals {
-  # if region is not passed, we assume the current one
-  managed_prometheus_workspace_id       = var.enable_managed_prometheus ? aws_prometheus_workspace.this[0].id : var.managed_prometheus_workspace_id
-  managed_prometheus_workspace_region   = coalesce(var.managed_prometheus_workspace_region, data.aws_region.current.name)
-  managed_prometheus_workspace_endpoint = "https://aps-workspaces.${local.managed_prometheus_workspace_region}.amazonaws.com/workspaces/${local.managed_prometheus_workspace_id}/"
-  managed_prometheus_workspace_arn      = "arn:${data.aws_partition.current.partition}:aps:${local.managed_prometheus_workspace_region}:${data.aws_caller_identity.current.account_id}:workspace/${local.managed_prometheus_workspace_id}"
+  arn_parts = split(":", var.managed_prometheus_workspace_arn)
+  managed_prometheus_workspace_region = local.arn_parts[3]
+  managed_prometheus_workspace_id = split("/", local.arn_parts[5])[1]
+  managed_prometheus_workspace_endpoint = "https://aps-workspaces.${local.managed_prometheus_workspace_region}.amazonaws.com/workspaces/${local.managed_prometheus_workspace_id}"
 
   name                      = "oso-observability-best-practices-prometheus"
   kube_service_account_name = try(var.helm_config.service_account, local.name)

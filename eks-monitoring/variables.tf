@@ -1,4 +1,4 @@
-variable "eks_cluster_id" {
+variable "eks_cluster_name" {
   description = "Name of the EKS cluster"
   type        = string
   default     = "eks-cluster-with-vpc"
@@ -9,14 +9,14 @@ variable "aws_region" {
   type        = string
 }
 
-variable "managed_prometheus_workspace_id" {
-  description = "Amazon Managed Service for Prometheus Workspace ID"
+variable "amp_ws_arn" {
+  description = "Amazon Managed Service for Prometheus Workspace ARN"
   type        = string
   default     = ""
 }
 
-variable "managed_grafana_workspace_id" {
-  description = "Amazon Managed Grafana Workspace ID"
+variable "amg_endpoint" {
+  description = "Amazon Managed Grafana Workspace Endpoint"
   type        = string
 }
 
