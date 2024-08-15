@@ -91,16 +91,16 @@ data "aws_iam_policy_document" "flux_source_controller_trust_policy" {
     actions = ["sts:AssumeRoleWithWebIdentity"]
     principals {
       type        = "Federated"
-      identifiers = [local.oidc_provider.arn]
+      identifiers = [aws_iam_openid_connect_provider.cluster.arn]
     }
     condition {
       test     = "StringEquals"
-      variable = "${replace(local.oidc_provider.url, "https://", "")}:aud"
+      variable = "${replace(aws_iam_openid_connect_provider.cluster.url, "https://", "")}:aud"
       values   = ["sts.amazonaws.com"]
     }
     condition {
       test     = "StringEquals"
-      variable = "${replace(local.oidc_provider.url, "https://", "")}:sub"
+      variable = "${replace(aws_iam_openid_connect_provider.cluster.url, "https://", "")}:sub"
       values   = ["system:serviceaccount:flux-system:source-controller"]
     }
   }
@@ -114,6 +114,12 @@ resource "aws_iam_role" "flux_source_controller_role" {
 resource "aws_iam_role_policy_attachment" "flux_source_controller_policy_attachment" {
   role       = aws_iam_role.flux_source_controller_role.name
   policy_arn = aws_iam_policy.flux_source_controller_policy.arn
+}
+
+resource "kubernetes_namespace" "flux_system" {
+  metadata {
+    name = "flux-system"
+  }
 }
 
 resource "kubernetes_service_account" "flux_source_controller" {
@@ -145,20 +151,10 @@ resource "helm_release" "grafana_operator" {
   max_history      = 3
 }
 
-data "aws_iam_openid_connect_provider" "cluster" {
-  url = data.aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
-}
-
 resource "aws_iam_openid_connect_provider" "cluster" {
-  count = data.aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer != "" && data.aws_iam_openid_connect_provider.cluster.id == "" ? 1 : 0
-
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = [data.tls_certificate.cluster.certificates[0].sha1_fingerprint]
   url             = data.aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
-}
-
-locals {
-  oidc_provider = length(aws_iam_openid_connect_provider.cluster) > 0 ? aws_iam_openid_connect_provider.cluster[0] : data.aws_iam_openid_connect_provider.cluster
 }
 
 /**
