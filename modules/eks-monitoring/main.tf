@@ -135,6 +135,8 @@ resource "kubernetes_service_account" "flux_source_controller" {
       "app.kubernetes.io/managed-by" = "Helm"
     }
   }
+
+  depends_on = [ kubernetes_namespace.flux_system ]
 }
 
 /**
