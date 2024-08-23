@@ -31,13 +31,3 @@ variable "enable_dashboards" {
   type        = bool
   default     = true
 }
-
-variable "access_key_id" {
-  description = "AWS Access Key ID"
-  type        = string
-  sensitive   = true
-}
-
-variable "access_key" {
-  
-}

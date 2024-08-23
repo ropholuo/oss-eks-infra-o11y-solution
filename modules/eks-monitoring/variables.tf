@@ -95,7 +95,7 @@ variable "flux_bucket_region" {
 variable "flux_bucket_path" {
   description = "Flux bucket prefix path"
   type        = string
-  default     = "EKS/OSS/artifacts"
+  default     = "EKS/OSS/CDK/v3.0.0"
 }
 
 variable "flux_bucket_endpoint" {
@@ -113,7 +113,7 @@ variable "flux_kustomization_name" {
 variable "flux_kustomization_path" {
   description = "Flux Kustomization Path"
   type        = string
-  default     = "EKS/OSS/artifacts/infrastructure"
+  default     = "EKS/OSS/CDK/v3.0.0/infrastructure"
 }
 
 variable "enable_kube_state_metrics" {
@@ -334,67 +334,67 @@ variable "grafana_url" {
 variable "grafana_cluster_dashboard_url" {
   description = "Dashboard URL for Cluster Grafana Dashboard JSON"
   type        = string
-  default     = "https://%s.s3.amazonaws.com/EKS/OSS/artifacts/grafana-dashboards/infrastructure/cluster.json"
+  default     = "https://%s.s3.amazonaws.com/EKS/OSS/CDK/v3.0.0/grafana-dashboards/infrastructure/cluster.json"
 }
 
 variable "grafana_kubelet_dashboard_url" {
   description = "Dashboard URL for Kubelet Grafana Dashboard JSON"
   type        = string
-  default     = "https://%s.s3.amazonaws.com/EKS/OSS/artifacts/grafana-dashboards/infrastructure/kubelet.json"
+  default     = "https://%s.s3.amazonaws.com/EKS/OSS/CDK/v3.0.0/grafana-dashboards/infrastructure/kubelet.json"
 }
 
 variable "grafana_namespace_workloads_dashboard_url" {
   description = "Dashboard URL for Namespace Workloads Grafana Dashboard JSON"
   type        = string
-  default     = "https://%s.s3.amazonaws.com/EKS/OSS/artifacts/grafana-dashboards/infrastructure/namespace-workloads.json"
+  default     = "https://%s.s3.amazonaws.com/EKS/OSS/CDK/v3.0.0/grafana-dashboards/infrastructure/namespace-workloads.json"
 }
 
 variable "grafana_node_exporter_dashboard_url" {
   description = "Dashboard URL for Node Exporter Grafana Dashboard JSON"
   type        = string
-  default     = "https://%s.s3.amazonaws.com/EKS/OSS/artifacts/grafana-dashboards/infrastructure/nodeexporter-nodes.json"
+  default     = "https://%s.s3.amazonaws.com/EKS/OSS/CDK/v3.0.0/grafana-dashboards/infrastructure/nodeexporter-nodes.json"
 }
 
 variable "grafana_nodes_dashboard_url" {
   description = "Dashboard URL for Nodes Grafana Dashboard JSON"
   type        = string
-  default     = "https://%s.s3.amazonaws.com/EKS/OSS/artifacts/grafana-dashboards/infrastructure/nodes.json"
+  default     = "https://%s.s3.amazonaws.com/EKS/OSS/CDK/v3.0.0/grafana-dashboards/infrastructure/nodes.json"
 }
 
 variable "grafana_workloads_dashboard_url" {
   description = "Dashboard URL for Workloads Grafana Dashboard JSON"
   type        = string
-  default     = "https://%s.s3.amazonaws.com/EKS/OSS/artifacts/grafana-dashboards/infrastructure/workloads.json"
+  default     = "https://%s.s3.amazonaws.com/EKS/OSS/CDK/v3.0.0/grafana-dashboards/infrastructure/workloads.json"
 }
 
 variable "grafana_fleet_dashboard_url" {
   description = "Dashboard URL for Fleet Grafana Dashboard JSON"
   type        = string
-  default     = "https://%s.s3.amazonaws.com/EKS/OSS/artifacts/grafana-dashboards/infrastructure/fleet-monitoring.json"
+  default     = "https://%s.s3.amazonaws.com/EKS/OSS/CDK/v3.0.0/grafana-dashboards/infrastructure/fleet-monitoring.json"
 }
 
 variable "grafana_logs_dashboard_url" {
   description = "Dashboard URL for Logs Grafana Dashboard JSON"
   type        = string
-  default     = "https://%s.s3.amazonaws.com/EKS/OSS/artifacts/grafana-dashboards/infrastructure/logs.json"
+  default     = "https://%s.s3.amazonaws.com/EKS/OSS/CDK/v3.0.0/grafana-dashboards/infrastructure/logs.json"
 }
 
 variable "grafana_apiserver_basic_dashboard_url" {
   description = "Dashboard URL for API Server Basic Dashboard JSON"
   type        = string
-  default     = "https://%s.s3.amazonaws.com/EKS/OSS/artifacts/grafana-dashboards/apiserver/apiserver-basic.json"
+  default     = "https://%s.s3.amazonaws.com/EKS/OSS/CDK/v3.0.0/grafana-dashboards/apiserver/apiserver-basic.json"
 }
 
 variable "grafana_apiserver_advanced_dashboard_url" {
   description = "Dashboard URL for API Server Advanced Dashboard JSON"
   type        = string
-  default     = "https://%s.s3.amazonaws.com/EKS/OSS/artifacts/grafana-dashboards/apiserver/apiserver-advanced.json"
+  default     = "https://%s.s3.amazonaws.com/EKS/OSS/CDK/v3.0.0/grafana-dashboards/apiserver/apiserver-advanced.json"
 }
 
 variable "grafana_apiserver_troubleshooting_dashboard_url" {
   description = "Dashboard URL for API Server Troubleshooting Dashboard JSON"
   type        = string
-  default     = "https://%s.s3.amazonaws.com/EKS/OSS/artifacts/grafana-dashboards/apiserver/apiserver-troubleshooting.json"
+  default     = "https://%s.s3.amazonaws.com/EKS/OSS/CDK/v3.0.0/grafana-dashboards/apiserver/apiserver-troubleshooting.json"
 }
 
 variable "target_secret_name" {
