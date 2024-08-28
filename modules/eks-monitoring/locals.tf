@@ -54,4 +54,25 @@ locals {
       troubleshooting = try(var.apiserver_monitoring_config.dashboards.troubleshooting, var.grafana_apiserver_troubleshooting_dashboard_url)
     }
   }
+
+  nginx_pattern_config = {
+    # disabled if options from module are disabled, by default
+    # can be overriden by providing a config
+    enable_alerting_rules  = var.enable_alerting_rules
+    enable_recording_rules = var.enable_recording_rules
+    enable_dashboards      = var.enable_dashboards
+
+    scrape_sample_limit = 1000
+
+    flux_gitrepository_name   = "aws-observability-accelerator"
+    flux_gitrepository_url    = "https://github.com/aws-observability/aws-observability-accelerator"
+    flux_gitrepository_branch = "v0.3.2"
+    flux_kustomization_name   = "grafana-dashboards-nginx"
+    flux_kustomization_path   = "./artifacts/grafana-operator-manifests/eks/nginx"
+
+    managed_prometheus_workspace_id = local.managed_prometheus_workspace_id
+    prometheus_metrics_endpoint     = "/metrics"
+
+    grafana_dashboard_url = "https://raw.githubusercontent.com/aws-observability/aws-observability-accelerator/v0.2.0/artifacts/grafana-dashboards/eks/nginx/nginx.json"
+  }
 }

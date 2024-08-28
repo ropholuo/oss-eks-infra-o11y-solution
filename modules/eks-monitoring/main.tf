@@ -34,6 +34,136 @@ resource "helm_release" "prometheus_node_exporter" {
   }
 }
 
+/** 
+  ADOT for Nginx
+*/
+module "operator" {
+  source = "./add-ons/adot-operator"
+  count  = 1
+
+  enable_cert_manager = var.enable_cert_manager
+  kubernetes_version  = local.eks_cluster_version
+  addon_context       = local.context
+}
+
+module "helm_addon" {
+  source = "github.com/aws-ia/terraform-aws-eks-blueprints//modules/kubernetes-addons/helm-addon?ref=v4.32.1"
+
+  helm_config = merge(
+    {
+      name        = local.name
+      chart       = "${path.module}/otel-config"
+      namespace   = local.namespace
+      description = "ADOT helm Chart deployment configuration"
+    },
+    var.helm_config
+  )
+
+  set_values = [
+    {
+      name  = "ampurl"
+      value = "${local.managed_prometheus_workspace_endpoint}/api/v1/remote_write"
+    },
+    {
+      name  = "region"
+      value = local.managed_prometheus_workspace_region
+    },
+    {
+      name  = "assumeRoleArn"
+      value = var.managed_prometheus_cross_account_role
+    },
+    {
+      name  = "ekscluster"
+      value = local.context.eks_cluster_id
+    },
+    {
+      name  = "globalScrapeInterval"
+      value = var.prometheus_config.global_scrape_interval
+    },
+    {
+      name  = "globalScrapeTimeout"
+      value = var.prometheus_config.global_scrape_timeout
+    },
+    {
+      name  = "adotLoglevel"
+      value = "normal"
+    },
+    {
+      name  = "adotServiceTelemetryLoglevel"
+      value = "INFO"
+    },
+    {
+      name  = "accountId"
+      value = local.context.aws_caller_identity_account_id
+    },
+    {
+      name  = "enableTracing"
+      value = var.enable_tracing
+    },
+    {
+      name  = "otlpHttpEndpoint"
+      value = var.tracing_config.otlp_http_endpoint
+    },
+    {
+      name  = "otlpGrpcEndpoint"
+      value = var.tracing_config.otlp_grpc_endpoint
+    },
+    {
+      name  = "tracingTimeout"
+      value = var.tracing_config.timeout
+    },
+    {
+      name  = "tracingSendBatchSize"
+      value = var.tracing_config.send_batch_size
+    },
+    {
+      name  = "enableCustomMetrics"
+      value = var.enable_custom_metrics
+    },
+    {
+      name  = "customMetrics"
+      value = yamlencode(var.custom_metrics_config)
+    },
+    {
+      name  = "nginxScrapeSampleLimit"
+      value = local.nginx_pattern_config.scrape_sample_limit
+    },
+    {
+      name  = "nginxPrometheusMetricsEndpoint"
+      value = local.nginx_pattern_config.prometheus_metrics_endpoint
+    },
+    {
+      name  = "enableAdotcollectorMetrics"
+      value = true
+    },
+    {
+      name  = "serviceAccount"
+      value = local.kube_service_account_name
+    },
+    {
+      name  = "namespace"
+      value = local.namespace
+    }
+  ]
+
+  irsa_iam_role_name = var.irsa_iam_role_name
+  irsa_config = {
+    create_kubernetes_namespace       = true
+    kubernetes_namespace              = local.namespace
+    create_kubernetes_service_account = true
+    kubernetes_service_account        = local.kube_service_account_name
+    irsa_iam_policies = flatten([
+      "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonPrometheusRemoteWriteAccess",
+      "arn:${data.aws_partition.current.partition}:iam::aws:policy/AWSXrayWriteOnlyAccess",
+      var.irsa_iam_additional_policies,
+    ])
+  }
+
+  addon_context = local.context
+
+  depends_on = [module.operator]
+}
+
 /**
  *  FluxCD
  */
@@ -178,23 +308,23 @@ data "aws_subnet" "this" {
   id       = each.value
 }
 
-resource "aws_prometheus_scraper" "this" {
-  source {
-    eks {
-      cluster_arn = local.eks_cluster_arn
-      // AMP Scraper only accept up to 5 subnets
-      subnet_ids = slice(local.filtered_subnets, 0, min(length(local.filtered_subnets), 5))
-    }
-  }
+# resource "aws_prometheus_scraper" "this" {
+#   source {
+#     eks {
+#       cluster_arn = local.eks_cluster_arn
+#       // AMP Scraper only accept up to 5 subnets
+#       subnet_ids = slice(local.filtered_subnets, 0, min(length(local.filtered_subnets), 5))
+#     }
+#   }
 
-  destination {
-    amp {
-      workspace_arn = var.managed_prometheus_workspace_arn
-    }
-  }
+#   destination {
+#     amp {
+#       workspace_arn = var.managed_prometheus_workspace_arn
+#     }
+#   }
 
-  scrape_configuration = replace(replace(file("${path.module}/amp-config/scraper-config.yaml"), "{{CLUSTER_NAME}}", var.eks_cluster_id), "{{VERSION_NUMBER}}", "3.0")
-}
+#   scrape_configuration = replace(replace(file("${path.module}/amp-config/scraper-config.yaml"), "{{CLUSTER_NAME}}", var.eks_cluster_id), "{{VERSION_NUMBER}}", "3.0")
+# }
 
 /**
  *  External Secrets
