@@ -35,7 +35,7 @@ resource "helm_release" "prometheus_node_exporter" {
 }
 
 /** 
-  ADOT for Nginx
+  Nginx
 */
 module "operator" {
   source = "./add-ons/adot-operator"
@@ -162,6 +162,13 @@ module "helm_addon" {
   addon_context = local.context
 
   depends_on = [module.operator]
+}
+
+module "nginx_monitoring" {
+  source = "./nginx"
+  count  = 1
+
+  pattern_config = local.nginx_pattern_config
 }
 
 /**
@@ -308,23 +315,23 @@ data "aws_subnet" "this" {
   id       = each.value
 }
 
-# resource "aws_prometheus_scraper" "this" {
-#   source {
-#     eks {
-#       cluster_arn = local.eks_cluster_arn
-#       // AMP Scraper only accept up to 5 subnets
-#       subnet_ids = slice(local.filtered_subnets, 0, min(length(local.filtered_subnets), 5))
-#     }
-#   }
+resource "aws_prometheus_scraper" "this" {
+  source {
+    eks {
+      cluster_arn = local.eks_cluster_arn
+      // AMP Scraper only accept up to 5 subnets
+      subnet_ids = slice(local.filtered_subnets, 0, min(length(local.filtered_subnets), 5))
+    }
+  }
 
-#   destination {
-#     amp {
-#       workspace_arn = var.managed_prometheus_workspace_arn
-#     }
-#   }
+  destination {
+    amp {
+      workspace_arn = var.managed_prometheus_workspace_arn
+    }
+  }
 
-#   scrape_configuration = replace(replace(file("${path.module}/amp-config/scraper-config.yaml"), "{{CLUSTER_NAME}}", var.eks_cluster_id), "{{VERSION_NUMBER}}", "3.0")
-# }
+  scrape_configuration = replace(replace(file("${path.module}/amp-config/scraper-config.yaml"), "{{CLUSTER_NAME}}", var.eks_cluster_id), "{{VERSION_NUMBER}}", "3.0")
+}
 
 /**
  *  External Secrets

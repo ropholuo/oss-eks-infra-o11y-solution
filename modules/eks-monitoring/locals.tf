@@ -66,7 +66,7 @@ locals {
 
     flux_gitrepository_name   = "aws-observability-accelerator"
     flux_gitrepository_url    = "https://github.com/aws-observability/aws-observability-accelerator"
-    flux_gitrepository_branch = "v0.3.2"
+    flux_gitrepository_branch = "main"
     flux_kustomization_name   = "grafana-dashboards-nginx"
     flux_kustomization_path   = "./artifacts/grafana-operator-manifests/eks/nginx"
 
